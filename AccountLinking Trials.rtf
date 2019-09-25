@@ -1,0 +1,374 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1671\cocoasubrtf600
+{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;}
+{\colortbl;\red255\green255\blue255;\red251\green2\blue7;\red255\green255\blue10;\red255\green250\blue131;
+\red163\green217\blue121;\red33\green255\blue255;}
+{\*\expandedcolortbl;;\cssrgb\c100000\c14913\c0;\cssrgb\c99942\c98555\c0;\cssrgb\c100000\c97501\c58325;
+\cssrgb\c69337\c86836\c54718;\cssrgb\c0\c99144\c100000;}
+\margl1440\margr1440\vieww28600\viewh18000\viewkind0
+\deftab560
+\pard\pardeftab560\slleading20\partightenfactor0
+
+\f0\fs34 \cf0 /* eslint-disable  func-names */\
+/* eslint-disable  no-console */\
+\
+const Alexa = require('ask-sdk');\
+\
+const \{\
+  getRequestType,\
+  getIntentName,\
+  getSlotValue,\
+  getDialogState,\
+\} = require('ask-sdk-core');\
+ \
+const LaunchRequestHandler = \{\
+  canHandle(handlerInput) \{\
+    return handlerInput.requestEnvelope.request.type === 'LaunchRequest';\
+  \},\
+  handle(handlerInput) \{\
+    const speakOutput = 'Welcome to A and D CONNECT. What shall I do? If you do not know what to do, please say help.';\
+   /\cf2 \cb3 /const accessToken  = handlerInput.requestEnvelope.context.System.user.accessToken;\
+    var accessToken = handlerInput.requestEnvelope.context.System.apiAccessToken;\
+    if(accessToken == undefined)\{\
+      //reattempt to get new accessToken from server\
+      var speechText = "You have connected to A&D Connect account.";\
+      return handlerInput.responseBuilder\
+        .speak(speechText)\
+        .reprompt('Is there anything else I should do?')\
+        .getResponse();\
+      \
+    \}\cf0 \cb1 \
+    return handlerInput.responseBuilder\
+      .speak(speakOutput)\
+      .reprompt('What shall I do?')\
+      .getResponse();\
+  \},\
+\};\
+\
+const GetBPHandler = \{\
+  canHandle(handlerInput) \{\
+    return (getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'\
+        && getIntentName(handlerInput.requestEnvelope) === 'BPIntent');\
+  \},\
+  handle(handlerInput) \{\
+    // This request needs access token to perfom action\
+   \cf2 \cb3  /*var accessToken = handlerInput.requestEnvelope.context.System.user.accessToken;\
+    if(accessToken == undefined)\{\
+      //reattempt to get new accessToken from server\
+      var speechText = "You have connected to A&D Connect account.";\
+      return handlerInput.responseBuilder\
+        .speak(speechText)\
+        .reprompt('Is there anything else I should do?')\
+        .getResponse();\
+      \
+    \}\
+    */\cf0 \cb1 \
+    const speechOutput = "Your last blood pressure is SYS 120 DIA 80 Pulse 60. Is there anything else I should do?";\
+    return handlerInput.responseBuilder\
+      .speak(speechOutput)\
+      .reprompt('Is there anything else I should do?')\
+      .getResponse();\
+  \},\
+\};\
+\
+const HelloWorldHandler = \{\
+  canHandle(handlerInput) \{\
+    return (handlerInput.requestEnvelope.request.type === 'IntentRequest'\
+        && handlerInput.requestEnvelope.request.intent.name === 'HelloWorldIntent');\
+  \},\
+  handle(handlerInput) \{\
+    const speechOutput = "Hello World, do you want to know your blood pressure today? Or do you want to know some facts about blood pressure?";\
+    return handlerInput.responseBuilder\
+      .speak(speechOutput)\
+      .reprompt('How can I help you?')\
+      .getResponse();\
+  \},\
+\};\
+\
+const HospitalHandler = \{\
+  canHandle(handlerInput) \{\
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'\
+        && handlerInput.requestEnvelope.request.intent.name === 'HospitalIntent';\
+  \},\
+  handle(handlerInput) \{\
+    const speechOutput = "Sorry, I can't answer the question. Because, I'm not doctor.";\
+    return handlerInput.responseBuilder\
+      .speak(speechOutput)\
+      .reprompt('Is there anything else I should do?')\
+      .getResponse();\
+  \},\
+\};\
+\
+const HelpHandler = \{\
+  canHandle(handlerInput) \{\
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'\
+      && handlerInput.requestEnvelope.request.intent.name === 'AMAZON.HelpIntent';\
+  \},\
+  handle(handlerInput) \{\
+    const HELP_MESSAGE = 'I will teach you your blood pressure value. For example, Please ask me How many blood pressure?';\
+    const HELP_REPROMPT = 'What shall I do?';\
+    return handlerInput.responseBuilder\
+      .speak(HELP_MESSAGE)\
+      .reprompt(HELP_REPROMPT)\
+      .getResponse();\
+  \},\
+\};\
+\
+const ExitHandler = \{\
+  canHandle(handlerInput) \{\
+    const request = handlerInput.requestEnvelope.request;\
+    return request.type === 'IntentRequest'\
+      && (request.intent.name === 'AMAZON.CancelIntent'\
+        || request.intent.name === 'AMAZON.StopIntent');\
+  \},\
+  handle(handlerInput) \{\
+    const STOP_MESSAGE = 'Thank you for using me. Goodbye!';\
+    return handlerInput.responseBuilder\
+      .speak(STOP_MESSAGE)\
+      .getResponse();\
+  \},\
+\};\
+\
+const SessionEndedRequestHandler = \{\
+  canHandle(handlerInput) \{\
+    //const request = handlerInput.requestEnvelope.request;\
+    return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';\
+  \},\
+  handle(handlerInput) \{\
+    console.log(`Session ended with reason: $\{handlerInput.requestEnvelope.request.reason\}`);\
+\
+    return handlerInput.responseBuilder.getResponse();\
+  \},\
+\};\
+\
+const ErrorHandler = \{\
+  canHandle() \{\
+    return true;\
+  \},\
+  handle(handlerInput, error) \{\
+    console.log(`Error handled: $\{error.message\}`);\
+\
+    return handlerInput.responseBuilder\
+      .speak('I beg your pardon? Please ask me again.') //Sorry, an error occurred.\
+       .reprompt('Is there anything else?')\
+      .getResponse();\
+  \},\
+\};\
+\
+
+\fs36 \
+const skillBuilder = Alexa.SkillBuilders.standard();\
+\
+exports.handler = skillBuilder\
+  .withSkillId('amzn1.ask.skill.bb212b34-c548-49b4-bcfe-d1f007240009')\
+  .addRequestHandlers(\
+    LaunchRequestHandler,\
+    GetBPHandler,\
+    HelloWorldHandler,\
+    HospitalHandler,\
+    SessionEndedRequestHandler,\
+    HelpHandler,\
+    ExitHandler\
+  )\
+  .addErrorHandlers(ErrorHandler)\
+  .lambda();\
+//  .addRequestInterceptors(LoggingRequestInterceptor)\
+//  .addResponseInterceptors(LoggingResponseInterceptor)
+\fs34 \
+\
+\
+\cf2 \cb4 /*\
+// define our target API as a "service"\
+const svc = new AWS.Service(\{\
+ \
+    // the API base URL\
+    endpoint: 'https://service.example.com/api/v2',\
+ \
+    // don't parse API responses\
+    // (this is optional if you want to define shapes of all your endpoint responses)\
+    convertResponseTypes: false,\
+ \
+    // and now, our API endpoints\
+    apiConfig: \{\
+        metadata: \{\
+            protocol: 'rest-json' // we assume our API is JSON-based\
+        \},\
+        operations: \{\
+ \
+            // API authentication endpoint\
+            Authenticate: \{\
+                http: \{\
+                    method: 'GET',\
+                    requestUri: '/login'\
+                \},\
+                input: \{\
+                    type: 'structure',\
+                    required: [ 'login', 'password' ],\
+                    members: \{\
+                        'login': \{\
+                            // include it as a query string parameter in the call URL\
+                            location: 'querystring',\
+                            // parameter name\
+                            locationName: 'loginName'\
+                        \},\
+                        'password': \{\
+                            location: 'querystring',\
+                            locationName: 'password',\
+                            // don't show it in the logs\
+                            sensitive: true\
+                        \}\
+                    \}\
+                \},\
+                // get the authentication token from the response\
+                output: \{\
+                    type: 'structure',\
+                    members: \{\
+                        'authToken': \{\
+                            // the token is returned as an HTTP response header\
+                            location: 'header',\
+                            // the header name\
+                            locationName: 'AuthToken'\
+                        \}\
+                    \}\
+                \}\
+            \},\
+ \
+            // get a record by id\
+            GetAccount: \{\
+                http: \{\
+                    method: 'GET',\
+                    // note the placeholder in the URI\
+                    requestUri: '/accounts/\{accountId\}'\
+                \},\
+                input: \{\
+                    type: 'structure',\
+                    required: [ 'auth', 'accountId' ],\
+                    members: \{\
+                        'auth': \{\
+                            // send authentication header in the HTTP request header\
+                            location: 'header',\
+                            locationName: 'Authorization',\
+                            sensitive: true\
+                        \},\
+                        'accountId': \{\
+                            // all kinds of validators are available\
+                            type: 'integer',\
+                            // include it in the call URI\
+                            location: 'uri',\
+                            // this is the name of the placeholder in the URI\
+                            locationName: 'accountId'\
+                        \}\
+                    \}\
+                \}\
+            \},\
+ \
+            // example how to send JSON data in the request body\
+            CreateAccount: \{\
+                http: \{\
+                    method: 'POST',\
+                    requestUri: '/accounts'\
+                \},\
+                input: \{\
+                    type: 'structure',\
+                    required: [ 'auth', 'data' ],\
+                    // use "data" input for the request payload\
+                    payload: 'data',\
+                    members: \{\
+                        'auth': \{\
+                            location: 'header',\
+                            locationName: 'Authorization',\
+                            sensitive: true\
+                        \},\
+                        'data': \{\
+                            type: 'structure',\
+                            required: [ 'firstName', 'lastName' ],\
+                            // the shape of the body object\
+                            members: \{\
+                                'firstName': \{\},\
+                                'lastName': \{\}\
+                            \}\
+                        \}\
+                    \}\
+                \}\
+            \}\
+        \}\
+    \}\
+\});\cf0 \cb1 \
+ \cf2 \
+\cb5 // disable AWS region related login in the SDK\
+svc.isGlobalEndpoint = true;\
+  \
+// and now we can call our target API!\
+exports.handler = function(event, context, callback) \{\
+ \
+    // note how the methods on our service are defined after the operations\
+    svc.authenticate(\{\
+        login: 'admin@example.com',\
+        password: 'SecretPassword!'\
+    \}, (err, data) => \{\
+ \
+        if (err) \{\
+            console.error('>>> login error:', err);\
+            return callback(err);\
+        \}\
+ \
+        svc.createAccount(\{\
+            auth: `Bearer $\{data.authToken\}`,\
+            data: \{\
+                firstName: 'John',\
+                lastName: 'Silver'\
+            \}\
+        \}, (err, data) => \{\
+ \
+            if (err) \{\
+                console.error('>>> operation error:', err);\
+                return callback(err);\
+            \}\
+ \
+            console.log('new record:', data);\
+ \
+            callback();\
+        \});\
+    \});\
+\};\
+*/\
+\cb1 \
+\
+\cb6 \
+/*\
+const AWS = require('aws-sdk');\
+const https = require('https');\
+//var request = require("request");\
+\
+  const options = \{ \
+    method: 'GET',\
+    url: 'https://alpha.wellnessconnected.com/wellnessconnected/webservice/v1/authservice/login',\
+    qs: \{ email: 'alonhari@andonline.com', password: 'New1234' \},\
+    headers: \{ 'cache-control': 'no-cache',\
+       Connection: 'keep-alive',\
+        'Accept-Encoding': 'gzip, deflate',\
+       Host: 'alpha.wellnessconnected.com',\
+       'Postman-Token': 'e19013c3-6915-449b-96a0-80f4b7e0c66f,23753ba1-2d09-4a12-892d-c8bfcfe7189e',\
+       'Cache-Control': 'no-cache',\
+       Accept: '* / *',\
+       'User-Agent': 'PostmanRuntime/7.16.3',\
+       'X-WellnessConnected-AppId': '0a2886a0' \} \
+  \};\
+  \
+    const request = https.request(options, (res) => \{\
+    console.log('StatusCode:', res.statusCode);\
+    console.log('headers:', res.headers);\
+    \
+    res.on('data', (d) => \{\
+      process.stdout.write(d);\
+    \});\
+  \});\
+  \
+  request.on('error', (e) =>\{\
+    console.error(e);\
+  \});\
+  request.end();\
+  request(options, function (error, response, body) \{\
+    if (error) throw new Error(error);\
+    console.log(body);\
+  \});\
+  */}
